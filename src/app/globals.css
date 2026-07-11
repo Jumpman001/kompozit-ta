@@ -121,10 +121,73 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+  }
+}
+
+/* ============================================================
+   КОМПОЗИТ Т.А. — Technical Editorial design tokens
+   ============================================================ */
+:root {
+  --paper: #f6f7f8;        /* cool paper base, tuned to logo blue */
+  --paper-2: #eceef1;      /* deeper paper for alternating bands */
+  --ink: #191716;          /* logo near-black ink */
+  --ink-soft: #34302e;
+  --cyan: #0087c9;         /* brand accent — exact logo blue */
+  --cyan-ink: #00669c;     /* AA-contrast logo blue for text on paper */
+  --muted: #5b6166;        /* AA muted text */
+  --line: #dde1e6;         /* hairline */
+  --line-2: #c9ced5;       /* stronger hairline */
+
+  --font-heading: var(--font-unbounded), system-ui, sans-serif;
+  --font-body: var(--font-manrope), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --container: 1280px;
+}
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+::selection { background: color-mix(in srgb, var(--cyan) 24%, transparent); }
+
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Editorial helpers */
+.ff-head { font-family: var(--font-heading); }
+.ff-body { font-family: var(--font-body); }
+.ff-mono { font-family: var(--font-mono); }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hairline { height: 1px; background: var(--line-2); }
+
+/* Editorial link underline that grows from the left */
+.link-underline {
+  background-image: linear-gradient(var(--cyan-ink), var(--cyan-ink));
+  background-size: 0% 1.5px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-underline:hover { background-size: 100% 1.5px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

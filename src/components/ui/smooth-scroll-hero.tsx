@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import Image from "next/image";
 
 import {
 	motion,
@@ -16,12 +17,10 @@ interface iISmoothScrollHeroProps {
 	scrollHeight: number;
 	/**
 	 * Background image URL for desktop view
-	 * @default "https://images.unsplash.com/photo-1511884642898-4c92249e20b6"
 	 */
 	desktopImage: string;
 	/**
 	 * Background image URL for mobile view
-	 * @default "https://images.unsplash.com/photo-1511207538754-e8555f2bc187?q=80&w=2412&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 	 */
 	mobileImage: string;
 	/**
@@ -49,53 +48,66 @@ const SmoothScrollHeroBackground: React.FC<
 }) => {
 	const {scrollY} = useScroll();
 
+	// Finish the reveal (clip + zoom) before the sticky panel unpins, so the
+	// full image is shown completely (and rests briefly) before content scrolls in.
+	const revealEnd = scrollHeight * 0.78;
+
 	const clipStart = useTransform(
 		scrollY,
-		[0, scrollHeight],
+		[0, revealEnd],
 		[initialClipPercentage, 0],
 	);
 	const clipEnd = useTransform(
 		scrollY,
-		[0, scrollHeight],
+		[0, revealEnd],
 		[finalClipPercentage, 100],
 	);
 
-	const clipPath = useMotionTemplate`polygon(${clipStart}% ${clipStart}%, ${clipEnd}% ${clipStart}%, ${clipEnd}% ${clipEnd}%, ${clipStart}% ${clipEnd}%)`;
+	// Reveal only vertically at full width — no left/right paper strips during scroll.
+	const clipPath = useMotionTemplate`polygon(0% ${clipStart}%, 100% ${clipStart}%, 100% ${clipEnd}%, 0% ${clipEnd}%)`;
 
-	const backgroundSize = useTransform(
-		scrollY,
-		[0, scrollHeight + 500],
-		["170%", "100%"],
-	);
+	// Zoom out to 1x as the user scrolls. 1.45 keeps the reveal effect while
+	// staying within the source resolution (higher zoom made the start blurry).
+	const scale = useTransform(scrollY, [0, revealEnd], [1.45, 1]);
 
 	return (
 		<motion.div
-			className="sticky top-0 h-screen w-full bg-black"
+			className="sticky top-0 h-screen w-full overflow-hidden bg-[var(--paper)]"
 			style={{
 				clipPath,
 				willChange: "transform, opacity",
 			}}
 		>
-			{/* Mobile background */}
+			{/* Mobile image */}
 			<motion.div
 				className="absolute inset-0 md:hidden"
-				style={{
-					backgroundImage: `url(${mobileImage})`,
-					backgroundSize,
-					backgroundPosition: "center",
-					backgroundRepeat: "no-repeat",
-				}}
-			/>
-			{/* Desktop background */}
+				style={{scale, transformOrigin: "50% 12%"}}
+			>
+				<Image
+					src={mobileImage}
+					alt="Завод КОМПОЗИТ Т.А. с высоты птичьего полёта на рассвете"
+					fill
+					priority
+					quality={90}
+					sizes="100vw"
+					className="object-cover object-[50%_12%]"
+				/>
+			</motion.div>
+			{/* Desktop image */}
 			<motion.div
 				className="absolute inset-0 hidden md:block"
-				style={{
-					backgroundImage: `url(${desktopImage})`,
-					backgroundSize,
-					backgroundPosition: "center",
-					backgroundRepeat: "no-repeat",
-				}}
-			/>
+				style={{scale, transformOrigin: "50% 12%"}}
+			>
+				<Image
+					src={desktopImage}
+					alt="Завод КОМПОЗИТ Т.А. с высоты птичьего полёта на рассвете"
+					fill
+					priority
+					quality={90}
+					sizes="100vw"
+					className="object-cover object-[50%_12%]"
+				/>
+			</motion.div>
 		</motion.div>
 	);
 };
@@ -107,8 +119,8 @@ const SmoothScrollHeroBackground: React.FC<
  */
  const SmoothScrollHero: React.FC<iISmoothScrollHeroProps> = ({
 	scrollHeight = 1500,
-	desktopImage = "https://images.unsplash.com/photo-1511884642898-4c92249e20b6",
-	mobileImage = "https://images.unsplash.com/photo-1511207538754-e8555f2bc187?q=80&w=2412&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+	desktopImage,
+	mobileImage,
 	initialClipPercentage = 25,
 	finalClipPercentage = 75,
 }) => {
