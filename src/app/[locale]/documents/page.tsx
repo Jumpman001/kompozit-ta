@@ -23,6 +23,7 @@ export async function generateMetadata({
 const CATALOGUES = [
   { key: "d1", file: "/materials/katalog-kompozit-ta.pdf", pages: 19, sizeMb: "2,2", lang: "langRuEn" },
   { key: "d2", file: "/materials/proekty-kompozit-ta.pdf", pages: 22, sizeMb: "3,5", lang: "langRuEn" },
+  { key: "d4", file: "/materials/prezentaciya-kompozit-ta.pdf", pages: 21, sizeMb: "2,1", lang: "langRu" },
 ] as const;
 
 const NORMS = [
