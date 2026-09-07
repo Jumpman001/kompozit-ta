@@ -33,6 +33,10 @@ interface iISmoothScrollHeroProps {
 	 * @default 75
 	 */
 	finalClipPercentage: number;
+	/**
+	 * Alt text for the background image
+	 */
+	imageAlt: string;
 }
 
 interface iISmoothScrollHeroBackgroundProps extends iISmoothScrollHeroProps {}
@@ -45,6 +49,7 @@ const SmoothScrollHeroBackground: React.FC<
 	mobileImage,
 	initialClipPercentage,
 	finalClipPercentage,
+	imageAlt,
 }) => {
 	const {scrollY} = useScroll();
 
@@ -81,16 +86,16 @@ const SmoothScrollHeroBackground: React.FC<
 			{/* Mobile image */}
 			<motion.div
 				className="absolute inset-0 md:hidden"
-				style={{scale, transformOrigin: "50% 12%"}}
+				style={{scale, transformOrigin: "85% 12%"}}
 			>
 				<Image
 					src={mobileImage}
-					alt="Завод КОМПОЗИТ Т.А. с высоты птичьего полёта на рассвете"
+					alt={imageAlt}
 					fill
 					priority
 					quality={90}
 					sizes="100vw"
-					className="object-cover object-[50%_12%]"
+					className="object-cover object-[85%_12%]"
 				/>
 			</motion.div>
 			{/* Desktop image */}
@@ -100,7 +105,7 @@ const SmoothScrollHeroBackground: React.FC<
 			>
 				<Image
 					src={desktopImage}
-					alt="Завод КОМПОЗИТ Т.А. с высоты птичьего полёта на рассвете"
+					alt={imageAlt}
 					fill
 					priority
 					quality={90}
@@ -123,6 +128,7 @@ const SmoothScrollHeroBackground: React.FC<
 	mobileImage,
 	initialClipPercentage = 25,
 	finalClipPercentage = 75,
+	imageAlt,
 }) => {
 	return (
 		<div
@@ -135,6 +141,7 @@ const SmoothScrollHeroBackground: React.FC<
 				mobileImage={mobileImage}
 				initialClipPercentage={initialClipPercentage}
 				finalClipPercentage={finalClipPercentage}
+				imageAlt={imageAlt}
 			/>
 		</div>
 	);

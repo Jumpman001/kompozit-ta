@@ -162,6 +162,21 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 .ff-body { font-family: var(--font-body); }
 .ff-mono { font-family: var(--font-mono); }
 
+/* Unbounded (заголовки) и JetBrains Mono (мелкие подписи) не умеют
+   рисовать ӯ ғ қ ҳ ҷ/Ҷ/Ҳ — получаются разнобойные буквы. На таджикской
+   версии переключаем оба на Manrope — он рисует их ровно. */
+[data-locale="tj"] .ff-head {
+  font-family: var(--font-body);
+  letter-spacing: -0.01em;
+  /* Manrope ExtraBold сам по себе тоньше, чем чёрный Unbounded —
+     обводка той же заливкой добавляет визуальной жирности. */
+  -webkit-text-stroke: 0.028em currentColor;
+}
+[data-locale="tj"] .ff-mono {
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+}
+
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -181,6 +196,16 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   transition: background-size 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .link-underline:hover { background-size: 100% 1.5px; }
+
+/* Liquid glass — translucent surface with a soft top-edge highlight,
+   for elements that float over photos/content (header, ghost buttons). */
+.liquid-glass {
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 60%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 25%, transparent),
+    0 8px 24px -8px color-mix(in srgb, var(--ink) 18%, transparent);
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,

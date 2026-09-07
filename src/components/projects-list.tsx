@@ -1,239 +1,121 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, X } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 type Spec = [string, string];
 
+/* Направления применения. Ключ = суффикс ключа перевода (areaWater и т.д.).
+   Определены по назначению объекта: PN 1 — самотёчный коллектор, PN 16–25 —
+   напорный водовод, PN 10 на сельхозучастке — орошение. */
+const AREAS = ["water", "sewer", "irrigation", "road", "other"] as const;
+type Area = (typeof AREAS)[number];
+
+const PROJECT_AREAS: Area[] = [
+  "water",      // 01 водовод Туткавул, DN 400 PN 25
+  "water",      // 02 водовод Дехи Сабур, DN 400 PN 25
+  "water",      // 03 насосная станция КАФ 1
+  "water",      // 04 водоснабжение Кофарнихан, DN 400–700 PN 16
+  "sewer",      // 05 канализация Каратегин и Зебунисо
+  "irrigation", // 06 сети орошения А-1…А-4
+  "road",       // 07 улица Каххоров — городские сети под дорогой
+  "sewer",      // 08 коллектор Южной зоны, DN 1400 PN 1
+  "road",       // 09 трасса «Рассвет-6»
+  "road",       // 10 дорога Западные ворота — Чортут
+  "irrigation", // 11 кооператив «Шахроми Худжанд»
+  "irrigation", // 12 ирригация Кумсангирского района
+  "other",      // 13 Центр развития ремёсел — сети объекта
+  "sewer",      // 14 Южный коллектор CW-03, PN 1
+  "other",      // 15 композитные решётки для парковок
+  "irrigation", // 16 дюкер через Шурчасай, Яванский район
+];
+
+const areaKey = (a: Area) => `area${a[0].toUpperCase()}${a.slice(1)}` as const;
+
 type Project = {
   n: string;
   title: string;
   done: boolean;
+  area: Area;
+  areaTitle: string;
+  /** короткая подпись в списке: инвестор · продукция · объём */
+  meta: string;
   spec: Spec[];
   imgs: string[];
+};
+
+type ProjectItem = {
+  title: string;
+  done: boolean;
+  investor: string;
+  /** У части объектов заказчик пока не подтверждён — строку тогда не рисуем. */
+  customer?: string;
+  product: string;
+  pressure?: string;
+  stiffness?: string;
+  volume?: string;
+  area?: string;
 };
 
 const imgs = (proj: number, count: number) =>
   Array.from({ length: count }, (_, i) => `/projects/p${String(proj).padStart(2, "0")}_${i + 1}.jpg`);
 
-const projects: Project[] = [
-  {
-    n: "01",
-    title: "Водопровод от ГСС до водохранилища Туткавул, г. Нурек",
-    done: true,
-    spec: [
-      ["Инвестор", "Европейский банк реконструкции и развития"],
-      ["Заказчик", "ОАО «Точик СГЭМ»"],
-      ["Продукция", "Стеклопластиковая труба DN 400"],
-      ["Давление", "PN 25"],
-      ["Жёсткость", "SN 7000 Н/м²"],
-      ["Объём", "7 551 м"],
-    ],
-    imgs: imgs(1, 4),
-  },
-  {
-    n: "02",
-    title: "Водопровод от ГСС до водохранилища Дехи Сабур, г. Нурек",
-    done: true,
-    spec: [
-      ["Инвестор", "Европейский банк реконструкции и развития"],
-      ["Заказчик", "ОАО «Точик СГЭМ»"],
-      ["Продукция", "Стеклопластиковая труба DN 400"],
-      ["Давление", "PN 25"],
-      ["Жёсткость", "SN 7000 Н/м²"],
-      ["Объём", "3 904 м"],
-    ],
-    imgs: imgs(2, 4),
-  },
-  {
-    n: "03",
-    title: "Восстановление насосной станции КАФ 1, г. Душанбе",
-    done: true,
-    spec: [
-      ["Инвестор", "Азиатский банк развития"],
-      ["Заказчик", "ОАО «Таджикгидроэлектромонтаж»"],
-      ["Продукция", "Композитные трубы DN 400–700"],
-      ["Давление", "PN 6–16"],
-      ["Жёсткость", "SN 5000 Н/м²"],
-      ["Объём", "2 411 м"],
-    ],
-    imgs: imgs(3, 4),
-  },
-  {
-    n: "04",
-    title: "Реконструкция водоснабжения станции Кофарнихан (КАФ 1), г. Душанбе",
-    done: true,
-    spec: [
-      ["Инвестор", "Азиатский банк развития"],
-      ["Заказчик", "ОАО «Таджикгидроэлектромонтаж»"],
-      ["Продукция", "Композитные трубы DN 400–700"],
-      ["Давление", "PN 16"],
-      ["Жёсткость", "SN 5000 Н/м²"],
-      ["Объём", "14 165 м"],
-    ],
-    imgs: imgs(4, 4),
-  },
-  {
-    n: "05",
-    title: "Восстановление канализации посёлков «Каратегин» и «Зебунисо», Душанбе",
-    done: true,
-    spec: [
-      ["Инвестор", "Азиатский банк развития"],
-      ["Заказчик", "ОАО «Таджикгидроэлектромонтаж»"],
-      ["Продукция", "Стеклопластиковые трубы DN 400–600"],
-      ["Давление", "PN 6"],
-      ["Жёсткость", "SN 5000–10000 Н/м²"],
-      ["Объём", "1 536 м"],
-    ],
-    imgs: imgs(5, 4),
-  },
-  {
-    n: "06",
-    title: "Замена сетей орошения районов А-1…А-4, Душанбе",
-    done: true,
-    spec: [
-      ["Инвестор", "Азиатский банк развития"],
-      ["Заказчик", "ООО «Строй-Центр»"],
-      ["Продукция", "Композитные трубы DN 400–600"],
-      ["Давление", "PN 10"],
-      ["Жёсткость", "SN 5000 Н/м²"],
-      ["Объём", "3 049 м"],
-    ],
-    imgs: imgs(6, 4),
-  },
-  {
-    n: "07",
-    title: "Реконструкция улицы «Каххоров», г. Душанбе",
-    done: false,
-    spec: [
-      ["Инвестор", "Исполнительный орган гос. власти г. Душанбе"],
-      ["Заказчик", "ООО «Авесто Групп»"],
-      ["Продукция", "Композитные трубы DN 400–1200"],
-      ["Давление", "PN 6–16"],
-      ["Жёсткость", "SN 5000–10000 Н/м²"],
-      ["Объём", "8 629 м"],
-    ],
-    imgs: imgs(7, 4),
-  },
-  {
-    n: "08",
-    title: "Восстановление канализационного коллектора Южной зоны, Душанбе",
-    done: true,
-    spec: [
-      ["Инвестор", "Азиатский банк развития"],
-      ["Заказчик", "ОАО «Таджикгидроэлектромонтаж»"],
-      ["Продукция", "Композитные трубы DN 1400"],
-      ["Давление", "PN 1"],
-      ["Жёсткость", "SN 5000–10000 Н/м²"],
-      ["Объём", "2 991 м"],
-    ],
-    imgs: imgs(8, 4),
-  },
-  {
-    n: "09",
-    title: "Реконструкция трассы «Рассвет-6», Хуросонский район",
-    done: false,
-    spec: [
-      ["Инвестор", "Азиатский банк развития"],
-      ["Заказчик", "ООО «Кудрат-2010»"],
-      ["Продукция", "Стеклопластиковые трубы DN 1000–1800"],
-      ["Давление", "PN 10–16"],
-      ["Жёсткость", "SN 5000 Н/м²"],
-      ["Объём", "2 854 м"],
-    ],
-    imgs: imgs(9, 4),
-  },
-  {
-    n: "10",
-    title: "Новая дорога от Западных ворот до Чортут, Душанбе",
-    done: true,
-    spec: [
-      ["Инвестор", "Исполнительный орган гос. власти г. Душанбе"],
-      ["Заказчик", "ОАО «Таджикгидроэлектромонтаж»"],
-      ["Продукция", "Композитная труба DN 600"],
-      ["Давление", "PN 16"],
-      ["Жёсткость", "SN 5000 Н/м²"],
-      ["Объём", "3 280 м"],
-    ],
-    imgs: imgs(10, 4),
-  },
-  {
-    n: "11",
-    title: "Кооператив «Шахроми Худжанд», Зафарабадский район",
-    done: true,
-    spec: [
-      ["Инвестор", "Кооператив «Шахроми Худжанд»"],
-      ["Заказчик", "Кооператив «Шахроми Худжанд»"],
-      ["Продукция", "Композитные трубы DN 500"],
-      ["Давление", "PN 6–10"],
-      ["Жёсткость", "SN 5000 Н/м²"],
-      ["Объём", "1 398 м"],
-    ],
-    imgs: [
-      "/projects/p11_1.jpg",
-      "/projects/p11_5.jpg",
-      "/projects/p11_6.jpg",
-      "/projects/p11_7.jpg",
-    ],
-  },
-  {
-    n: "12",
-    title: "Обновление ирригационных систем Кумсангирского района",
-    done: true,
-    spec: [
-      ["Инвестор", "Международная ассоциация развития · грантовый фонд ЕС"],
-      ["Заказчик", "ОАО «Таджикгидроэлектромонтаж»"],
-      ["Продукция", "Композитные трубы DN 600–1400"],
-      ["Давление", "PN 10"],
-      ["Жёсткость", "SN 5000 Н/м²"],
-      ["Объём", "1 375 м"],
-    ],
-    imgs: imgs(12, 4),
-  },
-  {
-    n: "13",
-    title: "Центр развития ремёсел, Дангаринский район",
-    done: true,
-    spec: [
-      ["Инвестор", "Исполнительный орган гос. власти г. Дангара"],
-      ["Заказчик", "ООО «Строй-Центр»"],
-      ["Продукция", "Композитная труба DN 400–1000"],
-      ["Давление", "PN 1–6"],
-      ["Жёсткость", "SN 5000–10000 Н/м²"],
-      ["Объём", "1 498 м"],
-    ],
-    imgs: imgs(13, 4),
-  },
-  {
-    n: "14",
-    title: "Восстановление Южного коллектора (CW-03), Душанбе",
-    done: true,
-    spec: [
-      ["Инвестор", "Азиатский банк развития"],
-      ["Заказчик", "ОАО «Таджик СГЭМ»"],
-      ["Продукция", "Композитные трубы DN 1000–1200"],
-      ["Давление", "PN 1"],
-      ["Жёсткость", "SN 5000–10000 Н/м²"],
-      ["Объём", "2 865 м"],
-    ],
-    imgs: imgs(14, 4),
-  },
-  {
-    n: "15",
-    title: "Композитные решётки для парковок, г. Душанбе",
-    done: false,
-    spec: [
-      ["Инвестор", "ООО «Нет Солюшенс»"],
-      ["Заказчик", "ООО «Нет Солюшенс»"],
-      ["Продукция", "Композитные решётки"],
-      ["Площадь", "3 514 м²"],
-    ],
-    imgs: imgs(15, 4),
-  },
+// Фото — одни и те же файлы для всех языков, поэтому держим их здесь,
+// а не в JSON с переводами. Текст (items) приходит из messages/*.json.
+const PROJECT_IMGS: string[][] = [
+  imgs(1, 4),
+  imgs(2, 4),
+  imgs(3, 4),
+  imgs(4, 4),
+  imgs(5, 4),
+  imgs(6, 4),
+  imgs(7, 4),
+  imgs(8, 4),
+  imgs(9, 4),
+  imgs(10, 4),
+  ["/projects/p11_1.jpg", "/projects/p11_5.jpg", "/projects/p11_6.jpg", "/projects/p11_7.jpg"],
+  imgs(12, 4),
+  imgs(13, 4),
+  imgs(14, 4),
+  imgs(15, 4),
+  [], // 16 — дюкер через Шурчасай, фотографий пока нет
 ];
+
+function useProjects(): Project[] {
+  const t = useTranslations("Projects");
+  const items = t.raw("items") as ProjectItem[];
+
+  return items.map((it, i) => {
+    const area = PROJECT_AREAS[i] ?? "other";
+    const spec: Spec[] = [
+      [t("areaLabel"), t(areaKey(area))],
+      [t("specInvestor"), it.investor],
+    ];
+    if (it.customer) spec.push([t("specCustomer"), it.customer]);
+    spec.push([t("specProduct"), it.product]);
+    if (it.pressure) spec.push([t("specPressure"), it.pressure]);
+    if (it.stiffness) spec.push([t("specStiffness"), it.stiffness]);
+    if (it.volume) spec.push([t("specVolume"), it.volume]);
+    if (it.area) spec.push([t("specArea"), it.area]);
+
+    return {
+      n: String(i + 1).padStart(2, "0"),
+      title: it.title,
+      done: it.done,
+      area,
+      areaTitle: t(areaKey(area)),
+      meta: [it.investor, it.product, it.volume ?? it.area].filter(Boolean).join(" · "),
+      spec,
+      imgs: PROJECT_IMGS[i] ?? [],
+    };
+  });
+}
 
 function ProjectModal({
   project,
@@ -242,6 +124,7 @@ function ProjectModal({
   project: Project;
   onClose: () => void;
 }) {
+  const t = useTranslations("Projects");
   const reduce = useReducedMotion();
 
   React.useEffect(() => {
@@ -264,7 +147,7 @@ function ProjectModal({
     >
       <button
         type="button"
-        aria-label="Закрыть"
+        aria-label={t("close")}
         onClick={onClose}
         className="absolute inset-0 bg-[var(--ink)]/55 backdrop-blur-sm"
       />
@@ -290,7 +173,7 @@ function ProjectModal({
                     : "border-[var(--cyan-ink)]/40 text-[var(--cyan-ink)]"
                 }`}
               >
-                {project.done ? "Завершён" : "В работе"}
+                {project.done ? t("statusDone") : t("statusInProgress")}
               </span>
             </div>
             <h3 className="mt-3 ff-head text-xl font-bold leading-snug tracking-[-0.01em] text-[var(--ink)] sm:text-2xl">
@@ -300,7 +183,7 @@ function ProjectModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Закрыть"
+            aria-label={t("close")}
             className="grid size-10 shrink-0 place-items-center rounded-full border border-[var(--line-2)] text-[var(--ink)] transition-colors hover:bg-[var(--paper-2)]"
           >
             <X className="size-5" />
@@ -319,38 +202,102 @@ function ProjectModal({
             ))}
           </dl>
 
+          {project.imgs.length > 0 && (
           <div className="mt-7">
-            <div className="eyebrow mb-3">Фотографии с объекта</div>
+            <div className="eyebrow mb-3">{t("photosLabel")}</div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {project.imgs.map((src, i) => (
                 <div
                   key={src}
                   className="relative aspect-[16/10] overflow-hidden rounded-lg border border-[var(--line-2)] bg-[var(--paper-2)]"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={src}
-                    alt={`${project.title} — фото ${i + 1}`}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
+                    alt={`${project.title} — ${t("photosLabel")} ${i + 1}`}
+                    fill
+                    sizes="(min-width: 640px) 33vw, 50vw"
+                    className="object-cover"
                   />
                 </div>
               ))}
             </div>
           </div>
+          )}
         </div>
       </motion.div>
     </motion.div>
   );
 }
 
-export function ProjectsList() {
+/** Читает ?area=... из адреса — чтобы со страницы продукции можно было
+ *  привести сразу к отфильтрованному списку. */
+function useInitialArea(): Area | "all" {
+  const params = useSearchParams();
+  const raw = params.get("area");
+  return raw && (AREAS as readonly string[]).includes(raw) ? (raw as Area) : "all";
+}
+
+function ProjectsListInner() {
+  const t = useTranslations("Projects");
+  const projects = useProjects();
   const [active, setActive] = React.useState<Project | null>(null);
+  const [area, setArea] = React.useState<Area | "all">(useInitialArea());
+
+  // сколько объектов в каждом направлении — показываем прямо в кнопке
+  const counts = React.useMemo(() => {
+    const c = new Map<Area, number>();
+    for (const p of projects) c.set(p.area, (c.get(p.area) ?? 0) + 1);
+    return c;
+  }, [projects]);
+
+  const filters: { key: Area | "all"; label: string; count: number }[] = [
+    { key: "all", label: t("areaAll"), count: projects.length },
+    ...AREAS.filter((a) => counts.get(a)).map((a) => ({
+      key: a as Area | "all",
+      label: t(areaKey(a)),
+      count: counts.get(a) ?? 0,
+    })),
+  ];
+
+  const shown = area === "all" ? projects : projects.filter((p) => p.area === area);
 
   return (
     <>
+      <div className="mt-16 flex items-baseline justify-between border-b border-[var(--line-2)] pb-5">
+        <h2 className="ff-head text-2xl font-bold tracking-[-0.02em] text-[var(--ink)] sm:text-3xl">
+          {t("objectsTitle")}
+        </h2>
+        <span className="ff-mono text-xs uppercase tracking-[0.14em] text-[var(--muted)]">
+          {t("projectsCount", { count: shown.length })}
+        </span>
+      </div>
+
+      <div className="mb-8 mt-8 flex flex-wrap gap-2" role="group" aria-label={t("areaLabel")}>
+        {filters.map((f) => {
+          const on = f.key === area;
+          return (
+            <button
+              key={f.key}
+              type="button"
+              onClick={() => setArea(f.key)}
+              aria-pressed={on}
+              className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 ff-mono text-[0.68rem] uppercase tracking-[0.1em] transition-colors duration-300 ${
+                on
+                  ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]"
+                  : "border-[var(--line-2)] text-[var(--muted)] hover:border-[var(--ink)] hover:text-[var(--ink)]"
+              }`}
+            >
+              {f.label}
+              <span className={on ? "text-[var(--paper)]/60" : "text-[var(--muted)]/70"}>
+                {f.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       <ul>
-        {projects.map((p) => (
+        {shown.map((p) => (
           <li key={p.n}>
             <button
               type="button"
@@ -360,11 +307,14 @@ export function ProjectsList() {
             >
               <span className="ff-mono text-sm text-[var(--cyan-ink)]">{p.n}</span>
               <div>
-                <h4 className="ff-head text-lg font-semibold leading-snug text-[var(--ink)] group-hover:text-[var(--cyan-ink)]">
+                <span className="ff-mono text-[0.62rem] uppercase tracking-[0.12em] text-[var(--cyan-ink)]">
+                  {p.areaTitle}
+                </span>
+                <h4 className="mt-1 ff-head text-lg font-semibold leading-snug text-[var(--ink)] group-hover:text-[var(--cyan-ink)]">
                   {p.title}
                 </h4>
                 <p className="mt-1.5 ff-mono text-[0.72rem] uppercase tracking-[0.08em] text-[var(--muted)]">
-                  {p.spec[0][1]} · {p.spec[2]?.[1] ?? ""} · {p.spec[p.spec.length - 1][1]}
+                  {p.meta}
                 </p>
               </div>
               <span className="flex items-center gap-2 justify-self-start sm:justify-self-end">
@@ -375,7 +325,7 @@ export function ProjectsList() {
                       : "border-[var(--cyan-ink)]/40 text-[var(--cyan-ink)]"
                   }`}
                 >
-                  {p.done ? "Завершён" : "В работе"}
+                  {p.done ? t("statusDone") : t("statusInProgress")}
                 </span>
                 <ArrowUpRight className="size-4 text-[var(--cyan-ink)] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </span>
@@ -384,9 +334,21 @@ export function ProjectsList() {
         ))}
       </ul>
 
+      {shown.length === 0 && (
+        <p className="py-10 text-[var(--muted)]">{t("areaEmpty")}</p>
+      )}
+
       <AnimatePresence>
         {active && <ProjectModal project={active} onClose={() => setActive(null)} />}
       </AnimatePresence>
     </>
+  );
+}
+
+export function ProjectsList() {
+  return (
+    <React.Suspense fallback={null}>
+      <ProjectsListInner />
+    </React.Suspense>
   );
 }

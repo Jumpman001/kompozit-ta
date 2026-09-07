@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ImageIcon, Play, X } from "lucide-react";
+import { ArrowRight, ImageIcon, Play, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -25,50 +27,45 @@ type News = {
   video?: Video;
 };
 
-/* ───────────────────────────────────────────────────────────────
-   НОВОСТИ. Чтобы добавить новость — впишите новый объект в начало
-   массива. Фото кладите в public/news и указывайте пути в photos.
-   ─────────────────────────────────────────────────────────────── */
-const news: News[] = [
-  {
-    id: "open-2021",
-    date: "28 августа 2021",
-    category: "Событие",
-    title: "Торжественное открытие завода КОМПОЗИТ Т.А.",
-    excerpt:
-      "Завод стеклопластиковых труб полного цикла запущен в Душанбе при участии Президента Республики Таджикистан.",
-    cover: "/factory-aerial.jpg",
-    body: [
-      "28 августа 2021 года состоялась торжественная церемония открытия предприятия «Композит Т.А.» с участием Президента Республики Таджикистан Эмомали Рахмона.",
-      "Завод построен за два года на площади 4 гектара как совместное предприятие компании «Авесто Групп» и азербайджанской «Азкомпозит». Предприятие выпускает стеклопластиковые трубы диаметром от 400 до 3000 мм, фитинги, решётки, ёмкости и опоры.",
-    ],
-    photos: [],
-    video: { type: "youtube", id: "9GrooVp7ATA" },
-  },
-  {
-    id: "58km",
-    date: "2024",
-    category: "Производство",
-    title: "Произведено более 58 000 метров стеклопластиковых труб",
-    excerpt:
-      "Продукция завода применена на 15 объектах водоснабжения, ирригации и канализации по всей стране.",
-    cover: "/projects/p04_2.jpg",
-    body: [
-      "К настоящему моменту «Композит Т.А.» произвёл свыше 58 438 метров стеклопластиковых труб.",
-      "Продукция завода применена на 15 объектах — от магистральных водоводов и ирригационных систем до канализационных коллекторов. Среди инвесторов проектов — Европейский банк реконструкции и развития, Азиатский банк развития и грантовый фонд ЕС.",
-    ],
-    photos: ["/projects/p04_1.jpg", "/projects/p04_2.jpg", "/projects/p06_1.jpg"],
-  },
-];
+/* Не переведено на JSON: cover/photos/video — одинаковые файлы для всех
+   языков. Чтобы добавить новость, впишите новый ключ (n3Date, n3Title...)
+   в messages/*.json и новую запись сюда. */
+function useNews(): News[] {
+  const t = useTranslations("News");
+  return [
+    {
+      id: "open-2021",
+      date: t("n1Date"),
+      category: t("n1Category"),
+      title: t("n1Title"),
+      excerpt: t("n1Excerpt"),
+      cover: "/factory-aerial.jpg",
+      body: [t("n1Body1"), t("n1Body2")],
+      photos: [],
+      video: { type: "youtube", id: "9GrooVp7ATA" },
+    },
+    {
+      id: "58km",
+      date: t("n2Date"),
+      category: t("n2Category"),
+      title: t("n2Title"),
+      excerpt: t("n2Excerpt"),
+      cover: "/projects/p04_2.jpg",
+      body: [t("n2Body1"), t("n2Body2")],
+      photos: ["/projects/p04_1.jpg", "/projects/p04_2.jpg", "/projects/p06_1.jpg"],
+    },
+  ];
+}
 
 function VideoEmbed({ video }: { video: Video }) {
+  const t = useTranslations("News");
   if (video.type === "youtube") {
     return (
       <div className="aspect-video w-full overflow-hidden rounded-xl border border-[var(--line-2)] bg-black">
         <iframe
           className="h-full w-full"
           src={`https://www.youtube-nocookie.com/embed/${video.id}`}
-          title="Видео"
+          title={t("videoLabel")}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
@@ -86,6 +83,7 @@ function VideoEmbed({ video }: { video: Video }) {
 }
 
 function NewsModal({ item, onClose }: { item: News; onClose: () => void }) {
+  const t = useTranslations("News");
   const reduce = useReducedMotion();
 
   React.useEffect(() => {
@@ -108,7 +106,7 @@ function NewsModal({ item, onClose }: { item: News; onClose: () => void }) {
     >
       <button
         type="button"
-        aria-label="Закрыть"
+        aria-label={t("close")}
         onClick={onClose}
         className="absolute inset-0 bg-[var(--ink)]/55 backdrop-blur-sm"
       />
@@ -136,7 +134,7 @@ function NewsModal({ item, onClose }: { item: News; onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Закрыть"
+            aria-label={t("close")}
             className="grid size-10 shrink-0 place-items-center rounded-full border border-[var(--line-2)] text-[var(--ink)] transition-colors hover:bg-[var(--paper-2)]"
           >
             <X className="size-5" />
@@ -146,8 +144,13 @@ function NewsModal({ item, onClose }: { item: News; onClose: () => void }) {
         <div className="px-6 py-7 sm:px-8 sm:py-8">
           {item.cover && (
             <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-xl border border-[var(--line-2)] bg-[var(--paper-2)]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.cover} alt={item.title} className="h-full w-full object-cover" />
+              <Image
+                src={item.cover}
+                alt={item.title}
+                fill
+                sizes="(min-width: 640px) 640px, 100vw"
+                className="object-cover"
+              />
             </div>
           )}
 
@@ -164,26 +167,26 @@ function NewsModal({ item, onClose }: { item: News; onClose: () => void }) {
 
           {item.video && (
             <div className="mt-7">
-              <div className="eyebrow mb-3">Видео</div>
+              <div className="eyebrow mb-3">{t("videoLabel")}</div>
               <VideoEmbed video={item.video} />
             </div>
           )}
 
           {item.photos.length > 0 && (
             <div className="mt-7">
-              <div className="eyebrow mb-3">Фотографии</div>
+              <div className="eyebrow mb-3">{t("photosLabel")}</div>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {item.photos.map((src, i) => (
                   <div
                     key={src}
                     className="relative aspect-[16/10] overflow-hidden rounded-lg border border-[var(--line-2)] bg-[var(--paper-2)]"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={src}
-                      alt={`${item.title} — фото ${i + 1}`}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
+                      alt={`${item.title} — ${t("photosLabel")} ${i + 1}`}
+                      fill
+                      sizes="(min-width: 640px) 33vw, 50vw"
+                      className="object-cover"
                     />
                   </div>
                 ))}
@@ -197,6 +200,8 @@ function NewsModal({ item, onClose }: { item: News; onClose: () => void }) {
 }
 
 export function NewsList() {
+  const t = useTranslations("News");
+  const news = useNews();
   const [active, setActive] = React.useState<News | null>(null);
 
   return (
@@ -213,12 +218,12 @@ export function NewsList() {
             <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-[var(--line-2)] bg-[var(--paper-2)]">
               {n.cover ? (
                 <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={n.cover}
                     alt={n.title}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                    loading="lazy"
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                   />
                   {n.video && (
                     <span className="absolute inset-0 grid place-items-center">
@@ -243,8 +248,12 @@ export function NewsList() {
               {n.title}
             </h3>
             <p className="mt-1.5 text-sm leading-relaxed text-[var(--muted)]">{n.excerpt}</p>
-            <span className="mt-3 ff-mono text-[0.68rem] uppercase tracking-[0.12em] text-[var(--cyan-ink)]">
-              Читать →
+            <span className="mt-3 inline-flex items-center gap-1.5 ff-mono text-[0.68rem] uppercase tracking-[0.12em] text-[var(--cyan-ink)]">
+              {t("readMore")}
+              <ArrowRight
+                className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
             </span>
           </button>
         ))}

@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Plus, ShieldCheck, X } from "lucide-react";
+import { ShieldCheck, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Reveal, RevealStagger, RevealItem } from "./reveal";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -12,7 +14,6 @@ type Spec = [string, string];
 type PoleDetails = {
   kind: "pole";
   intro: string;
-  standard: string;
   specs: Spec[];
 };
 
@@ -60,157 +61,109 @@ type Product = {
   n: string;
   title: string;
   spec: string;
+  photo?: string;
   details?: Details;
 };
 
-const pipeDetails: PipeDetails = {
-  kind: "pipe",
-  intro:
-    "Композитные трубы GRP диаметром DN 400–3000, изготовленные методом непрерывной намотки. Раструбное соединение с уплотнительными кольцами — монтаж без сварки. Секции длиной от 1,5 до 12 м.",
-  common: [
-    ["Материал", "GRP / стеклопластик"],
-    ["Диаметр", "DN 400–3000"],
-    ["Кольцевая жёсткость", "SN 2500 – 10 000 Н/м²"],
-    ["Длина секции", "1,5 – 12 м"],
-    ["Раструб", "350 мм"],
-    ["Соединение", "раструбное, без сварки"],
-  ],
-  variants: [
-    {
-      title: "Водоснабжение",
-      tag: "Напорная · PN 16",
-      img: "/pipe-water.svg",
-      quick: "PN 16 · 2 уплотнительных кольца",
-    },
-    {
-      title: "Канализация",
-      tag: "Безнапорная · PN 1",
-      img: "/pipe-sewer.svg",
-      quick: "PN 1 · 1 уплотнительное кольцо",
-    },
-  ],
-  joint: {
-    img: "/pipe-joint.svg",
-    title: "Тип раструбного соединения",
-    desc: "Соединение «раструб–ниппель»: гладкий конец одной трубы входит в раструб другой, герметичность обеспечивают резиновые уплотнительные кольца. Монтаж без сварки и фланцев, глубина захода стыка 235 мм. Соединение допускает осевые подвижки и компенсирует температурные деформации трубопровода.",
-  },
+/* Переведённая часть (тексты) приходит из messages/*.json (Products.items,
+   тот же порядок, что и здесь). Фото и SVG-чертежи — одни файлы для всех
+   языков, поэтому остаются здесь как статика. */
+type RawItem = {
+  title: string;
+  spec: string;
+  intro?: string;
+  common?: Spec[];
+  specs?: Spec[];
+  variants?: { title: string; tag: string; quick: string }[];
+  items?: { title: string; tag: string }[];
+  jointTitle?: string;
+  jointDesc?: string;
+  certTitle?: string;
+  certLines?: string[];
 };
 
-const fittingDetails: FittingDetails = {
-  kind: "fitting",
-  intro:
-    "Фасонные изделия GRP полностью ручного изготовления: крестовины, отводы, переходы, тройники. Раструбное и фланцевое соединение, диаметры DN 400–3000.",
-  items: [
+function useProducts(): Product[] {
+  const t = useTranslations("Products");
+  const items = t.raw("items") as RawItem[];
+
+  const [pipe, fitting, grid, hatch, pole, tank] = items;
+
+  return [
     {
-      title: "Крестовина",
-      tag: "DN 400 · PN 16",
-      img: "/fitting-cross.svg",
+      n: "01",
+      title: pipe.title,
+      spec: pipe.spec,
+      photo: "/product-pipes.jpg",
+      details: {
+        kind: "pipe",
+        intro: pipe.intro!,
+        common: pipe.common!,
+        variants: [
+          { ...pipe.variants![0], img: "/pipe-water.svg" },
+          { ...pipe.variants![1], img: "/pipe-sewer.svg" },
+        ],
+        joint: { img: "/pipe-joint.svg", title: pipe.jointTitle!, desc: pipe.jointDesc! },
+      },
     },
     {
-      title: "Отвод 90°",
-      tag: "DN 400 · PN 10",
-      img: "/fitting-elbow90.svg",
+      n: "02",
+      title: fitting.title,
+      spec: fitting.spec,
+      photo: "/product-fittings-v2.jpg",
+      details: {
+        kind: "fitting",
+        intro: fitting.intro!,
+        items: [
+          { ...fitting.items![0], img: "/fitting-cross.svg" },
+          { ...fitting.items![1], img: "/fitting-elbow90.svg" },
+          { ...fitting.items![2], img: "/fitting-reducer.svg" },
+        ],
+      },
     },
     {
-      title: "Переход концентрический",
-      tag: "Ø 800×600 · PN 6",
-      img: "/fitting-reducer.svg",
+      n: "03",
+      title: grid.title,
+      spec: grid.spec,
+      photo: "/product-grid.jpg",
+      details: {
+        kind: "grid",
+        intro: grid.intro!,
+        img: "/grid-deck.svg",
+        specs: grid.specs!,
+        cert: { title: grid.certTitle!, lines: grid.certLines! },
+      },
     },
-  ],
-};
-
-const tankDetails: TankDetails = {
-  kind: "tank",
-  intro:
-    "Композитные ёмкости GRP для воды, стоков и технических жидкостей. Горизонтальное и вертикальное исполнение, люк и патрубки под проект. Объём от 100 до 37 000 л.",
-  img: "/tank.svg",
-  specs: [
-    ["Материал", "GRP / стеклопластик"],
-    ["Объём", "от 100 до 37 000 л"],
-    ["Диаметр", "до Ø 2000 мм"],
-    ["Длина", "до 12 000 мм"],
-    ["Люк", "Ø 800 мм"],
-    ["Патрубки", "вход/выход Ø100, обратка Ø50"],
-  ],
-};
-
-const gridDetails: GridDetails = {
-  kind: "grid",
-  intro:
-    "Композитный решётчатый настил GRP для площадок, мостков и настилов в агрессивных средах: коррозионная стойкость, малый вес и противоскользящая поверхность.",
-  img: "/grid-deck.svg",
-  specs: [
-    ["Материал", "GRP / стеклопластик"],
-    ["Размер ячейки", "50 × 50 мм"],
-    ["Толщина", "7 мм"],
-    ["Лист", "1220 × 3660 мм"],
-  ],
-  cert: {
-    title: "Испытание на жёсткость в аккредитованной лаборатории",
-    lines: [
-      "Аккредитованная лаборатория ООО «Композит Т.А.» (аттестат №TJ 762.37100.02.037-2024).",
-      "Методы: BS 4592-0, BS 4592-6, ГОСТ 33376-2015. Оборудование HGW-100.",
-      "Образец 50×50×7 мм испытан на изгиб при линейной нагрузке на пролётах 400–1200 мм.",
-      "Результат: фактические прогибы ниже нормативных; трещин, расслоений и разрушений не выявлено — соответствует техническим требованиям.",
-    ],
-  },
-};
-
-const poleDetails: PoleDetails = {
-  kind: "pole",
-  intro:
-    "Опоры для линий электропередач 0,4 кВ с самонесущим изолированным проводом (СИП).",
-  standard:
-    "Производятся по требованиям Азербайджанской электросети (технология AZKOMPOZIT).",
-  specs: [
-    ["Общая длина", "7,8 м"],
-    ["Глубина закапывания", "1,4 м"],
-    ["Диаметр", "140 мм"],
-    ["Толщина стенки", "4 мм"],
-    ["Нагрузка на высоте 6,4 м", "60 кг"],
-    ["Скорость ветра", "до 162 км/ч"],
-    ["Натяжение на вершине", "1 kN"],
-    ["Жёсткость", "≥ 15 000 N/m²"],
-    ["Модуль Юнга", "18 GPa"],
-    ["Огнестойкость", "V-0 (UL 94)"],
-    ["УФ-защита", "Да"],
-    ["Вес", "25 кг"],
-  ],
-};
-
-const products: Product[] = [
-  {
-    n: "01",
-    title: "Композитные трубы",
-    spec: "DN 400–3000 · SN 5000 · 1,5–12 м",
-    details: pipeDetails,
-  },
-  {
-    n: "02",
-    title: "Фитинги",
-    spec: "DN 400–3000 · крестовины, отводы, переходы",
-    details: fittingDetails,
-  },
-  {
-    n: "03",
-    title: "Решётки",
-    spec: "Настил 50×50×7 · испытано на жёсткость",
-    details: gridDetails,
-  },
-  { n: "04", title: "Канализационные люки", spec: "Стеклопластик" },
-  {
-    n: "05",
-    title: "ЛЭП опоры 0,4 кВ",
-    spec: "Длина 7,8 м · ⌀ 140 мм",
-    details: poleDetails,
-  },
-  {
-    n: "06",
-    title: "Ёмкости",
-    spec: "от 100 до 37 000 л · Ø до 2000 мм",
-    details: tankDetails,
-  },
-];
+    {
+      n: "04",
+      title: hatch.title,
+      spec: hatch.spec,
+      photo: "/product-hatch.jpg",
+    },
+    {
+      n: "05",
+      title: pole.title,
+      spec: pole.spec,
+      photo: "/product-pole-v2.jpg",
+      details: {
+        kind: "pole",
+        intro: pole.intro!,
+        specs: pole.specs!,
+      },
+    },
+    {
+      n: "06",
+      title: tank.title,
+      spec: tank.spec,
+      photo: "/product-tank-v3.jpg",
+      details: {
+        kind: "tank",
+        intro: tank.intro!,
+        img: "/tank.svg",
+        specs: tank.specs!,
+      },
+    },
+  ];
+}
 
 /* Vertical GRP pole schematic — echoes the spec drawing. */
 function PoleDiagram() {
@@ -252,7 +205,6 @@ function PoleBody({ d }: { d: PoleDetails }) {
     <div className="grid gap-8 px-6 py-7 sm:grid-cols-[1fr_auto] sm:px-8 sm:py-8">
       <div>
         <p className="text-[var(--ink-soft)]">{d.intro}</p>
-        <p className="mt-2 text-sm text-[var(--muted)]">{d.standard}</p>
         <div className="mt-7">
           <SpecTable specs={d.specs} />
         </div>
@@ -265,6 +217,7 @@ function PoleBody({ d }: { d: PoleDetails }) {
 }
 
 function PipeBody({ d }: { d: PipeDetails }) {
+  const t = useTranslations("Products");
   return (
     <div className="px-6 py-7 sm:px-8 sm:py-8">
       <p className="max-w-2xl text-[var(--ink-soft)]">{d.intro}</p>
@@ -288,7 +241,7 @@ function PipeBody({ d }: { d: PipeDetails }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={v.img}
-                alt={`Чертёж стеклопластиковой трубы — ${v.title}`}
+                alt={v.title}
                 className="mx-auto block h-auto w-full max-w-[640px]"
                 loading="lazy"
               />
@@ -302,13 +255,13 @@ function PipeBody({ d }: { d: PipeDetails }) {
 
       {/* common spec */}
       <div className="mt-8">
-        <div className="eyebrow mb-3">Общие характеристики</div>
+        <div className="eyebrow mb-3">{t("commonSpecsLabel")}</div>
         <SpecTable specs={d.common} />
       </div>
 
       {/* joint type */}
       <div className="mt-8">
-        <div className="eyebrow mb-3">Соединение</div>
+        <div className="eyebrow mb-3">{t("jointSectionLabel")}</div>
         <figure className="overflow-hidden rounded-xl border border-[var(--line-2)] bg-white">
           <figcaption className="border-b border-[var(--line)] px-5 py-3">
             <span className="ff-head text-base font-semibold text-[var(--ink)]">
@@ -357,7 +310,7 @@ function FittingBody({ d }: { d: FittingDetails }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={it.img}
-                alt={`Чертёж фитинга — ${it.title}`}
+                alt={it.title}
                 className="mx-auto block h-auto w-full max-w-[560px]"
                 loading="lazy"
               />
@@ -379,7 +332,7 @@ function TankBody({ d }: { d: TankDetails }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={d.img}
-            alt="Чертёж композитной ёмкости"
+            alt=""
             className="mx-auto block h-auto w-full max-w-[640px]"
             loading="lazy"
           />
@@ -403,7 +356,7 @@ function GridBody({ d }: { d: GridDetails }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={d.img}
-            alt="Чертёж композитного решётчатого настила"
+            alt=""
             className="mx-auto block h-auto w-full max-w-[640px]"
             loading="lazy"
           />
@@ -444,6 +397,7 @@ function ProductModal({
   product: Product;
   onClose: () => void;
 }) {
+  const t = useTranslations("Products");
   const reduce = useReducedMotion();
 
   React.useEffect(() => {
@@ -473,7 +427,7 @@ function ProductModal({
     >
       <button
         type="button"
-        aria-label="Закрыть"
+        aria-label={t("close")}
         onClick={onClose}
         className="absolute inset-0 bg-[var(--ink)]/55 backdrop-blur-sm"
       />
@@ -481,7 +435,7 @@ function ProductModal({
       <motion.div
         role="dialog"
         aria-modal="true"
-        aria-label={`Технические параметры — ${product.title}`}
+        aria-label={`${t("technicalParams")} — ${product.title}`}
         className={`relative z-10 max-h-[92svh] w-full overflow-y-auto border border-[var(--line-2)] bg-[var(--paper)] sm:rounded-2xl ${
           wide ? "max-w-3xl" : "max-w-2xl"
         }`}
@@ -492,7 +446,7 @@ function ProductModal({
       >
         <div className="sticky top-0 flex items-start justify-between gap-4 border-b border-[var(--line)] bg-[var(--paper)]/95 px-6 py-5 backdrop-blur sm:px-8">
           <div>
-            <div className="eyebrow">Технические параметры</div>
+            <div className="eyebrow">{t("technicalParams")}</div>
             <h3 className="mt-2 ff-head text-2xl font-bold tracking-[-0.02em] text-[var(--ink)]">
               {product.title}
             </h3>
@@ -500,7 +454,7 @@ function ProductModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Закрыть"
+            aria-label={t("close")}
             className="grid size-10 shrink-0 place-items-center rounded-full border border-[var(--line-2)] text-[var(--ink)] transition-colors hover:bg-[var(--paper-2)]"
           >
             <X className="size-5" />
@@ -524,6 +478,8 @@ function ProductModal({
 }
 
 export function ProductRange() {
+  const t = useTranslations("Products");
+  const products = useProducts();
   const [active, setActive] = React.useState<Product | null>(null);
 
   return (
@@ -531,10 +487,10 @@ export function ProductRange() {
       <Reveal>
         <div className="flex items-baseline justify-between border-b border-[var(--line-2)] pb-5">
           <h3 className="ff-head text-2xl font-bold tracking-[-0.02em] text-[var(--ink)] sm:text-3xl">
-            Линейка продукции
+            {t("rangeTitle")}
           </h3>
           <span className="ff-mono text-xs uppercase tracking-[0.14em] text-[var(--muted)]">
-            6 категорий
+            {t("rangeCount")}
           </span>
         </div>
       </Reveal>
@@ -542,40 +498,46 @@ export function ProductRange() {
       <RevealStagger className="mt-px grid gap-px overflow-hidden border-x border-b border-[var(--line)] bg-[var(--line)] sm:grid-cols-2 lg:grid-cols-3">
         {products.map((p) => {
           const interactive = Boolean(p.details);
+          const card = (
+            <>
+              {p.photo && (
+                <Image
+                  src={p.photo}
+                  alt=""
+                  aria-hidden
+                  fill
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  className={`-z-10 object-cover transition-transform duration-700 ease-out ${
+                    interactive ? "group-hover:scale-105" : ""
+                  }`}
+                />
+              )}
+              <div
+                aria-hidden
+                className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--ink)_35%,transparent)_0%,color-mix(in_srgb,var(--ink)_20%,transparent)_45%,color-mix(in_srgb,var(--ink)_88%,transparent)_100%)]"
+              />
+              <h4 className="ff-head text-lg font-semibold text-[var(--paper)] [text-shadow:0_1px_4px_rgba(0,0,0,0.85)]">
+                {p.title}
+              </h4>
+              <p className="mt-1.5 ff-mono text-[0.72rem] uppercase tracking-[0.1em] text-[var(--paper)]/80 [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]">
+                {p.spec}
+              </p>
+            </>
+          );
           return (
-            <RevealItem key={p.n} className="bg-[var(--paper)]">
+            <RevealItem key={p.n} className="bg-[var(--ink)]">
               {interactive ? (
                 <button
                   type="button"
                   onClick={() => setActive(p)}
-                  className="group flex h-full w-full flex-col items-start p-7 text-left transition-colors hover:bg-[var(--paper-2)] focus-visible:bg-[var(--paper-2)]"
+                  className="group relative isolate flex aspect-[4/3] w-full flex-col justify-end overflow-hidden p-7 text-left"
                   aria-haspopup="dialog"
                 >
-                  <div className="flex w-full items-center justify-between">
-                    <span className="ff-mono text-xs text-[var(--cyan-ink)]">{p.n}</span>
-                    <span className="grid size-7 place-items-center rounded-full border border-[var(--line-2)] text-[var(--cyan-ink)] transition-colors group-hover:border-[var(--cyan-ink)] group-hover:bg-[var(--cyan-ink)] group-hover:text-[var(--paper)]">
-                      <Plus className="size-4" />
-                    </span>
-                  </div>
-                  <h4 className="mt-5 ff-head text-lg font-semibold text-[var(--ink)]">
-                    {p.title}
-                  </h4>
-                  <p className="mt-1.5 ff-mono text-[0.72rem] uppercase tracking-[0.1em] text-[var(--muted)]">
-                    {p.spec}
-                  </p>
-                  <span className="mt-4 ff-mono text-[0.68rem] uppercase tracking-[0.12em] text-[var(--cyan-ink)]">
-                    Подробнее →
-                  </span>
+                  {card}
                 </button>
               ) : (
-                <div className="p-7">
-                  <span className="ff-mono text-xs text-[var(--cyan-ink)]">{p.n}</span>
-                  <h4 className="mt-5 ff-head text-lg font-semibold text-[var(--ink)]">
-                    {p.title}
-                  </h4>
-                  <p className="mt-1.5 ff-mono text-[0.72rem] uppercase tracking-[0.1em] text-[var(--muted)]">
-                    {p.spec}
-                  </p>
+                <div className="relative isolate flex aspect-[4/3] w-full flex-col justify-end overflow-hidden p-7">
+                  {card}
                 </div>
               )}
             </RevealItem>

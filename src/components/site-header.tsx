@@ -2,18 +2,64 @@
 
 import * as React from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useTranslations, useLocale } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
+import { Logo } from "./logo";
+import { routing } from "@/i18n/routing";
 
-const NAV = [
-  { href: "#about", label: "О компании", index: "01" },
-  { href: "#products", label: "Продукция", index: "02" },
-  { href: "#production", label: "Производство", index: "03" },
-  { href: "#applications", label: "Проекты", index: "04" },
-  { href: "#services", label: "Услуги", index: "05" },
-  { href: "#news", label: "Новости", index: "06" },
-  { href: "#contact", label: "Контакты", index: "09" },
+const NAV_KEYS = [
+  { href: "/about", key: "about" as const, index: "01" },
+  { href: "/products", key: "products" as const, index: "02" },
+  { href: "/production", key: "production" as const, index: "03" },
+  { href: "/projects", key: "projects" as const, index: "04" },
+  { href: "/services", key: "services" as const, index: "05" },
+  { href: "/news", key: "news" as const, index: "06" },
+  { href: "/contact", key: "contact" as const, index: "07" },
 ];
 
-export function SiteHeader() {
+const LANGUAGE_LABEL: Record<string, string> = {
+  ru: "RU",
+  tj: "TJ",
+  en: "EN",
+};
+
+function LanguageSwitcher({
+  className,
+  textColor,
+  linkClassName = "",
+  onNavigate,
+}: {
+  className?: string;
+  textColor?: string;
+  /** Доп. классы для самих ссылок — на телефоне нужны крупнее, чтобы попасть пальцем */
+  linkClassName?: string;
+  onNavigate?: () => void;
+}) {
+  const locale = useLocale();
+  const pathname = usePathname();
+
+  return (
+    <div className={className}>
+      {routing.locales.map((l) => (
+        <Link
+          key={l}
+          href={pathname}
+          locale={l}
+          onClick={onNavigate}
+          aria-current={l === locale ? "true" : undefined}
+          className={`ff-mono text-xs uppercase tracking-[0.08em] transition-colors ${linkClassName} ${textColor ?? ""} ${
+            l === locale ? "font-semibold opacity-100" : "opacity-55 hover:opacity-100"
+          }`}
+        >
+          {LANGUAGE_LABEL[l] ?? l}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+export function SiteHeader({ dark = false }: { dark?: boolean }) {
+  const t = useTranslations("Nav");
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const reduce = useReducedMotion();
@@ -32,52 +78,77 @@ export function SiteHeader() {
     };
   }, [open]);
 
+  // Once scrolled, the header wears its own light "liquid glass" tint —
+  // text is always dark ink against it, no matter what's behind. Before
+  // that, the header is fully transparent, so text must match whatever
+  // that page's top section actually is (light paper vs. dark ink).
+  const inkText = scrolled || !dark;
+  const textColor = inkText ? "text-[var(--ink-soft)]" : "text-[var(--paper)]";
+  const textColorHover = inkText ? "hover:text-[var(--ink)]" : "hover:text-[var(--paper)]/70";
+  const iconColor = inkText ? "text-[var(--ink)]" : "text-[var(--paper)]";
+  const iconBorder = inkText ? "border-[var(--line-2)]" : "border-[var(--paper)]/40";
+
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "border-b border-[var(--line)] bg-[var(--paper)]/85 backdrop-blur-md"
+            ? "liquid-glass backdrop-blur-xl backdrop-saturate-150 border-b border-transparent"
             : "border-b border-transparent"
         }`}
       >
-        <div className="mx-auto flex max-w-[var(--container)] items-center justify-between px-5 py-3 sm:px-8 md:grid md:grid-cols-[1fr_auto_1fr]">
-          <a
-            href="#top"
-            aria-label="КОМПОЗИТ Т.А. — на главную"
-            className="justify-self-start shrink-0"
+        <div className="mx-auto flex max-w-[var(--container)] items-center justify-between px-5 py-3 sm:px-8 xl:grid xl:grid-cols-[auto_1fr_auto] xl:gap-x-6">
+          <Link
+            href="/"
+            aria-label={t("logoAlt")}
+            className="-my-1 shrink-0 justify-self-start py-1"
           >
-            <img
-              src="/logo.svg"
-              alt="КОМПОЗИТ Т.А. — стеклопластиковые трубы"
-              className="h-9 w-auto sm:h-10"
-            />
-          </a>
+            {/* Два слоя: тёмный текст для светлого фона, белый — для тёмного.
+                Плавно подменяются вместе с остальными цветами шапки. */}
+            <span className="relative block shrink-0">
+              <Logo
+                className={`h-9 w-auto transition-opacity duration-300 sm:h-10 ${
+                  inkText ? "opacity-100" : "opacity-0"
+                }`}
+              />
+              <Logo
+                light
+                hidden
+                className={`absolute inset-0 h-9 w-auto transition-opacity duration-300 sm:h-10 ${
+                  inkText ? "opacity-0" : "opacity-100"
+                }`}
+              />
+            </span>
+          </Link>
 
-          <nav className="hidden items-center gap-7 md:flex lg:gap-9">
-            {NAV.map((n) => (
-              <a
+          <nav className="hidden items-center justify-center gap-3.5 xl:flex">
+            {NAV_KEYS.map((n) => (
+              <Link
                 key={n.href}
                 href={n.href}
-                className="link-underline text-[0.9rem] font-medium tracking-tight text-[var(--ink-soft)] hover:text-[var(--ink)]"
+                className={`link-underline whitespace-nowrap text-[0.85rem] font-medium tracking-tight transition-colors duration-300 ${textColor} ${textColorHover}`}
               >
-                {n.label}
-              </a>
+                {t(n.key)}
+              </Link>
             ))}
           </nav>
 
-          <div className="flex items-center justify-end gap-3">
-            <a
-              href="#contact"
-              className="hidden rounded-full bg-[var(--ink)] px-5 py-2.5 text-[0.9rem] font-semibold text-[var(--paper)] transition-transform hover:-translate-y-0.5 sm:inline-block"
+          <div className="flex shrink-0 items-center justify-end gap-4">
+            <LanguageSwitcher
+              className="hidden items-center gap-2.5 xl:flex"
+              textColor={textColor}
+            />
+            <Link
+              href="/contact"
+              className="hidden whitespace-nowrap rounded-full bg-[var(--ink)] px-5 py-2.5 text-[0.9rem] font-semibold text-[var(--paper)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[var(--cyan)] sm:inline-block"
             >
-              Запросить КП
-            </a>
+              {t("cta")}
+            </Link>
             <button
               type="button"
               onClick={() => setOpen(true)}
-              aria-label="Открыть меню"
-              className="grid h-11 w-11 place-items-center rounded-full border border-[var(--line-2)] text-[var(--ink)] md:hidden"
+              aria-label={t("openMenu")}
+              className={`grid h-11 w-11 place-items-center rounded-full border transition-colors duration-300 xl:hidden ${iconBorder} ${iconColor}`}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M3 6h18M3 12h18M3 18h18" />
@@ -91,18 +162,18 @@ export function SiteHeader() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[60] flex flex-col bg-[var(--paper)] px-6 pb-10 pt-5 md:hidden"
+            className="fixed inset-0 z-[60] flex flex-col overflow-y-auto overscroll-contain bg-[var(--paper)] px-6 pb-10 pt-5 xl:hidden"
             initial={reduce ? { opacity: 0 } : { clipPath: "inset(0 0 100% 0)" }}
             animate={reduce ? { opacity: 1 } : { clipPath: "inset(0 0 0% 0)" }}
             exit={reduce ? { opacity: 0 } : { clipPath: "inset(0 0 100% 0)" }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="flex items-center justify-between">
-              <img src="/logo.svg" alt="КОМПОЗИТ Т.А." className="h-[72px] w-auto" />
+              <Logo className="h-[60px] w-auto" />
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="Закрыть меню"
+                aria-label={t("closeMenu")}
                 className="grid h-11 w-11 place-items-center rounded-full border border-[var(--line-2)] text-[var(--ink)]"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -111,30 +182,36 @@ export function SiteHeader() {
               </button>
             </div>
 
-            <nav className="mt-12 flex flex-col">
-              {NAV.map((n) => (
-                <a
+            <nav className="mt-8 flex flex-col">
+              {NAV_KEYS.map((n) => (
+                <Link
                   key={n.href}
                   href={n.href}
                   onClick={() => setOpen(false)}
-                  className="flex items-baseline justify-between border-b border-[var(--line)] py-5"
+                  className="flex items-baseline justify-between border-b border-[var(--line)] py-4"
                 >
                   <span className="ff-head text-3xl font-bold tracking-tight text-[var(--ink)]">
-                    {n.label}
+                    {t(n.key)}
                   </span>
                   <span className="ff-mono text-xs text-[var(--muted)]">{n.index}</span>
-                </a>
+                </Link>
               ))}
             </nav>
 
-            <div className="mt-auto space-y-2 ff-mono text-sm text-[var(--muted)]">
-              <a href="tel:+992446007080" className="block text-[var(--ink)]">
-                +992 44 600-70-80
+            <LanguageSwitcher
+              className="mt-6 flex items-center gap-3"
+              linkClassName="grid min-h-11 min-w-14 place-items-center rounded-full border border-[var(--line-2)] text-sm"
+              onNavigate={() => setOpen(false)}
+            />
+
+            <div className="mt-auto pt-4 space-y-2 ff-mono text-sm text-[var(--muted)]">
+              <a href="tel:+992900841177" className="block text-[var(--ink)]">
+                {t("phone")}
               </a>
-              <a href="mailto:sales@kompozit-ta.tj" className="block">
-                sales@kompozit-ta.tj
+              <a href="mailto:info@composite.tj" className="block">
+                {t("email")}
               </a>
-              <p>г. Душанбе, Республика Таджикистан</p>
+              <p>{t("address")}</p>
             </div>
           </motion.div>
         )}
