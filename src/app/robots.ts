@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://kompozit-ta.tj/sitemap.xml",
+    sitemap: "https://composite.tj/sitemap.xml",
   };
 }

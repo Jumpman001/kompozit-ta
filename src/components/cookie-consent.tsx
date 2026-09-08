@@ -92,7 +92,10 @@ export function CookieConsent() {
               </p>
               <p className="mt-2 max-w-2xl leading-relaxed text-[var(--ink-soft)]">
                 {t("cookieBody")}{" "}
-                <Link href="/privacy" className="link-underline text-[var(--cyan-ink)]">
+                <Link
+                  href="/privacy"
+                  className="link-underline inline-flex min-h-11 items-center text-[var(--cyan-ink)]"
+                >
                   {t("cookieMore")}
                 </Link>
               </p>

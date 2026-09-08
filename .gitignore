@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# исходники, которые не публикуются: 3D-модели и оригиналы фото.
+# Весят ~220 МБ — в репозиторий и на сервер им не надо.
+/assets-3d
+/assets-original

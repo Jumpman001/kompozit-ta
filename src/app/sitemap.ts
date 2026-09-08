@@ -16,7 +16,7 @@ const routes = [
   { path: "/privacy", priority: 0.3 },
 ];
 
-const BASE = "https://kompozit-ta.tj";
+const BASE = "https://composite.tj";
 
 // ru — язык по умолчанию, без префикса в адресе; tj/en — с префиксом.
 const prefix = (locale: string) => (locale === routing.defaultLocale ? "" : `/${locale}`);

@@ -53,7 +53,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "Metadata" });
 
   return {
-    metadataBase: new URL("https://kompozit-ta.tj"),
+    metadataBase: new URL("https://composite.tj"),
     title: {
       default: t("title"),
       template: `%s · ${t("siteName")}`,

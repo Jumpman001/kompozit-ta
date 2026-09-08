@@ -28,7 +28,7 @@ export default function PrivacyPage() {
               <p className="ff-mono text-[0.65rem] uppercase tracking-[0.18em] text-[var(--cyan)] sm:text-[0.72rem] sm:tracking-[0.24em]">
                 {t("heroCaption")}
               </p>
-              <h1 className="mt-4 max-w-3xl ff-head text-4xl font-bold leading-[1.04] tracking-[-0.02em] sm:text-5xl">
+              <h1 className="mt-4 max-w-3xl ff-head text-3xl font-bold leading-[1.04] tracking-[-0.02em] [overflow-wrap:anywhere] sm:text-5xl">
                 {t("heroTitle")}
               </h1>
               <p className="mt-6 ff-mono text-xs uppercase tracking-[0.12em] text-[var(--paper)]/60">
