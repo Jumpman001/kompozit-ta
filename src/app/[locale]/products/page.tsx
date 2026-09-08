@@ -141,25 +141,11 @@ export default function ProductsPage() {
               </Reveal>
 
               <Reveal delay={0.1}>
-                <p className="leading-relaxed text-[var(--ink-soft)]">{t("jointDesc")}</p>
+                <p className="ff-head text-xl font-bold leading-snug tracking-[-0.01em] text-[var(--ink)] sm:text-2xl">
+                  {t("jointLead")}
+                </p>
+                <p className="mt-5 leading-relaxed text-[var(--ink-soft)]">{t("jointDesc")}</p>
 
-                <ol className="mt-8 space-y-5">
-                  {(["1", "2", "3", "4", "5"] as const).map((n) => (
-                    <li key={n} className="flex gap-4">
-                      <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-[var(--line-2)] ff-mono text-[0.66rem] text-[var(--cyan-ink)]">
-                        {n}
-                      </span>
-                      <span>
-                        <span className="block ff-head text-base font-semibold text-[var(--ink)]">
-                          {t(`jointL${n}`)}
-                        </span>
-                        <span className="mt-1 block text-sm leading-relaxed text-[var(--muted)]">
-                          {t(`jointL${n}Desc`)}
-                        </span>
-                      </span>
-                    </li>
-                  ))}
-                </ol>
               </Reveal>
             </div>
           </div>

@@ -24,28 +24,10 @@ const PIPE_PITCH = 4.632;
 const TRAVEL = 1.25;   // на сколько вторая труба отъезжает в разобранном виде
 const CUT_OPEN = 0.62; // положение плоскости, при котором ничего не срезано
 
-/* Куда ставить номерные метки.
-
-   moves — метка принадлежит ВТОРОЙ трубе, и координата у неё СВОЯ,
-   в системе этой трубы (она потом сдвигается вместе с ней). У остальных
-   координата мировая. Перепутать легко: метка просто улетает за кадр.
-
-   Точки лежат на кромке разреза (y ≈ 0, z ≈ радиус): именно там видно
-   толщину стенки и слои. Стык находится около x = 2.3 — ниппель первой
-   трубы занимает 1.98…2.47, раструб второй начинается на 2.13. */
-const PINS: { x: number; y: number; z: number; moves: boolean }[] = [
-  { x: -1.99, y: -0.02, z: 0.555, moves: true }, // 1 раструб (на второй трубе)
-  { x: 2.05, y: -0.02, z: 0.5, moves: false },   // 2 ниппель
-  { x: 2.3, y: -0.02, z: 0.5, moves: false },    // 3 кольца в каналах
-  { x: 1.3, y: -0.02, z: 0.5, moves: false },    // 4 слои стенки
-  { x: 2.47, y: -0.02, z: 0.36, moves: false },  // 5 упор
-];
-
 export function JointViewer() {
   const t = useTranslations("Products");
   const boxRef = React.useRef<HTMLDivElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const pinRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
   const replayRef = React.useRef<(() => void) | null>(null);
 
   const [near, setNear] = React.useState(false);
@@ -211,30 +193,6 @@ export function JointViewer() {
         hold = 0.6;
       };
 
-      const probe = new THREE.Vector3();
-      function drawPins() {
-        // Метки показываем только когда разрез открылся: раньше они
-        // указывали бы на детали, которых ещё не видно.
-        const show = cut > 0.55 && !dragging;
-        PINS.forEach((pin, i) => {
-          const el = pinRefs.current[i];
-          if (!el) return;
-          if (!show) {
-            el.style.opacity = "0";
-            return;
-          }
-          probe.set(pin.x + (pin.moves ? nipple.position.x : 0), pin.y, pin.z);
-          probe.project(camera);
-          const inFrame =
-            probe.z < 1 && Math.abs(probe.x) < 1 && Math.abs(probe.y) < 1;
-          el.style.opacity = inFrame ? "1" : "0";
-          if (inFrame) {
-            el.style.left = `${((probe.x + 1) / 2) * width}px`;
-            el.style.top = `${((1 - probe.y) / 2) * height}px`;
-          }
-        });
-      }
-
       let previous = performance.now();
       let frameId = 0;
       const tick = (now: number) => {
@@ -270,7 +228,6 @@ export function JointViewer() {
         );
         camera.lookAt(target);
         renderer.render(scene, camera);
-        drawPins();
         frameId = requestAnimationFrame(tick);
       };
       frameId = requestAnimationFrame(tick);
@@ -308,19 +265,6 @@ export function JointViewer() {
         aria-label={t("jointAlt")}
         role="img"
       />
-
-      {PINS.map((_, i) => (
-        <span
-          key={i}
-          ref={(el) => {
-            pinRefs.current[i] = el;
-          }}
-          aria-hidden="true"
-          className="pointer-events-none absolute grid size-7 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[var(--ink)] ff-mono text-[0.68rem] text-[var(--paper)] opacity-0 shadow-lg transition-opacity duration-300"
-        >
-          {i + 1}
-        </span>
-      ))}
 
       {!ready && !failed && (
         <div className="grid aspect-[16/10] place-items-center gap-3 text-[var(--muted)]">
