@@ -295,7 +295,7 @@
         "done": true,
         "investor": "Asian Development Bank",
         "customer": "Tajikgidroelektromontazh OJSC",
-        "product": "Composite pipes DN 400–700",
+        "product": "GRP pipes DN 400–700",
         "pressure": "PN 6–16",
         "stiffness": "SN 5000 N/m²",
         "volume": "2,411 m"
@@ -305,7 +305,7 @@
         "done": true,
         "investor": "Asian Development Bank",
         "customer": "Tajikgidroelektromontazh OJSC",
-        "product": "Composite pipes DN 400–700",
+        "product": "GRP pipes DN 400–700",
         "pressure": "PN 16",
         "stiffness": "SN 5000 N/m²",
         "volume": "14,165 m"
@@ -325,7 +325,7 @@
         "done": true,
         "investor": "Asian Development Bank",
         "customer": "Stroy-Center LLC",
-        "product": "Composite pipes DN 400–600",
+        "product": "GRP pipes DN 400–600",
         "pressure": "PN 10",
         "stiffness": "SN 5000 N/m²",
         "volume": "3,049 m"
@@ -335,7 +335,7 @@
         "done": false,
         "investor": "Executive Body of State Power of Dushanbe",
         "customer": "Avesto Group LLC",
-        "product": "Composite pipes DN 400–1200",
+        "product": "GRP pipes DN 400–1200",
         "pressure": "PN 6–16",
         "stiffness": "SN 5000–10000 N/m²",
         "volume": "8,629 m"
@@ -345,7 +345,7 @@
         "done": true,
         "investor": "Asian Development Bank",
         "customer": "Tajikgidroelektromontazh OJSC",
-        "product": "Composite pipes DN 1400",
+        "product": "GRP pipes DN 1400",
         "pressure": "PN 1",
         "stiffness": "SN 5000–10000 N/m²",
         "volume": "2,991 m"
@@ -365,7 +365,7 @@
         "done": true,
         "investor": "Executive Body of State Power of Dushanbe",
         "customer": "Tajikgidroelektromontazh OJSC",
-        "product": "Composite pipe DN 600",
+        "product": "GRP pipe DN 600",
         "pressure": "PN 16",
         "stiffness": "SN 5000 N/m²",
         "volume": "3,280 m"
@@ -375,7 +375,7 @@
         "done": true,
         "investor": "Shahromi Khujand Cooperative",
         "customer": "Shahromi Khujand Cooperative",
-        "product": "Composite pipes DN 500",
+        "product": "GRP pipes DN 500",
         "pressure": "PN 6–10",
         "stiffness": "SN 5000 N/m²",
         "volume": "1,398 m"
@@ -385,7 +385,7 @@
         "done": true,
         "investor": "International Development Association · EU grant fund",
         "customer": "Tajikgidroelektromontazh OJSC",
-        "product": "Composite pipes DN 600–1400",
+        "product": "GRP pipes DN 600–1400",
         "pressure": "PN 10",
         "stiffness": "SN 5000 N/m²",
         "volume": "1,375 m"
@@ -395,7 +395,7 @@
         "done": true,
         "investor": "Executive Body of State Power of Dangara",
         "customer": "Stroy-Center LLC",
-        "product": "Composite pipe DN 400–1000",
+        "product": "GRP pipe DN 400–1000",
         "pressure": "PN 1–6",
         "stiffness": "SN 5000–10000 N/m²",
         "volume": "1,498 m"
@@ -405,24 +405,24 @@
         "done": true,
         "investor": "Asian Development Bank",
         "customer": "Tajik SGEM OJSC",
-        "product": "Composite pipes DN 1000–1200",
+        "product": "GRP pipes DN 1000–1200",
         "pressure": "PN 1",
         "stiffness": "SN 5000–10000 N/m²",
         "volume": "2,865 m"
       },
       {
-        "title": "Composite grating for parking lots, Dushanbe",
+        "title": "GRP grating for parking lots, Dushanbe",
         "done": false,
         "investor": "Net Solutions LLC",
         "customer": "Net Solutions LLC",
-        "product": "Composite grating",
+        "product": "GRP grating",
         "area": "3,514 m²"
       },
       {
         "title": "Second line of the Shurchasay inverted siphon, Yavan district",
         "done": false,
         "investor": "Asian Development Bank",
-        "product": "Composite pipes DN 1800",
+        "product": "GRP pipes DN 1800",
         "volume": "948 m"
       }
     ],
@@ -460,9 +460,9 @@
     "m2Meta": "PDF · 22 pp. · 3.5 MB",
     "items": [
       {
-        "title": "Composite pipes",
+        "title": "GRP pipes",
         "spec": "DN 400–3000 · SN 5000 · 1.5–12 m",
-        "intro": "GRP composite pipes, DN 400–3000, made by continuous filament winding. Bell-and-spigot joints with sealing rings — no-weld installation. Sections from 1.5 to 12 m long.",
+        "intro": "GRP (glass-reinforced plastic) pipes, DN 400–3000, made by continuous filament winding. Bell-and-spigot joints with sealing rings — no-weld installation. Sections from 1.5 to 12 m long.",
         "common": [
           [
             "Material",
@@ -526,7 +526,7 @@
       {
         "title": "Grating",
         "spec": "50×50×7 decking · stiffness-tested",
-        "intro": "GRP composite grating decking for platforms, walkways, and flooring in aggressive environments: corrosion resistance, low weight, and a non-slip surface.",
+        "intro": "GRP grating decking for platforms, walkways, and flooring in aggressive environments: corrosion resistance, low weight, and a non-slip surface.",
         "specs": [
           [
             "Material",
@@ -615,7 +615,7 @@
       {
         "title": "Tanks",
         "spec": "100 to 37,000 L · Ø up to 2000 mm",
-        "intro": "GRP composite tanks for water, wastewater, and process fluids. Horizontal and vertical configurations, with manhole and nozzles built to the project. Volume from 100 to 37,000 L.",
+        "intro": "GRP tanks for water, wastewater, and process fluids. Horizontal and vertical configurations, with manhole and nozzles built to the project. Volume from 100 to 37,000 L.",
         "specs": [
           [
             "Material",
@@ -711,13 +711,13 @@
     "p1Period": "12.01.2026 — 12.07.2026",
     "p1Basis": "Test reports No. TJ 10–14 dated 12.01.2026, testing laboratory MTJ 762.37100.02.037-2024",
     "p1Alt": "Tajikstandard certificate of conformity No. 222678 for a batch of GRP pipes manufactured by KOMPOZIT T.A.",
-    "p2Title": "Composite gratings, batch of 1,000 m²",
-    "p2Product": "Composite grating decking, 1,000 m²",
+    "p2Title": "GRP gratings, batch of 1,000 m²",
+    "p2Product": "GRP grating decking, 1,000 m²",
     "p2Number": "No. 141807",
     "p2Standard": "SBD 33376-2015, BS 4592-0, BS 4592-6",
     "p2Period": "29.08.2024 — 29.02.2025",
     "p2Basis": "Tested in the plant's own testing laboratory",
-    "p2Alt": "Tajikstandard certificate of conformity No. 141807 for a batch of composite gratings manufactured by KOMPOZIT T.A.",
+    "p2Alt": "Tajikstandard certificate of conformity No. 141807 for a batch of GRP gratings manufactured by KOMPOZIT T.A.",
     "docsCta": "All documents and materials"
   },
   "ContactForm": {
