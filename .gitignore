@@ -57,3 +57,7 @@ next-env.d.ts
 
 # облегчённые копии картинок — делаются при сборке
 /public/opt
+
+# локальные переменные для wrangler dev — как .env.local, но для Cloudflare
+.dev.vars
+.dev.vars.*
