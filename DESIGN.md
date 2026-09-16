@@ -79,7 +79,11 @@
 
 ## 7. Картинки
 
-- Только `next/image`. **CSS `background-image` для фотографий запрещён** — Next их не сжимает,
+- Только компонент `<Img>` из `src/components/img.tsx`. `next/image` больше не
+  используется: на Cloudflare Workers нет сервиса `/_next/image`, он отдавал
+  оригинал при любой ширине. `<Img>` строит `<picture>` с готовыми вариантами
+  AVIF и WebP (640/1080/1920), которые делает `scripts/gen-images.mjs` при сборке.
+- **CSS `background-image` для фотографий запрещён** — Next их не сжимает,
   телефон качает десктопную версию. Фон делается через `<Image fill className="-z-10 object-cover">`
   внутри `relative isolate` контейнера.
 - Всегда указывать `sizes`. Шаблон для сетки 3 колонки:

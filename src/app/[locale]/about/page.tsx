@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { Img } from "@/components/img";
 import { ArrowUpRight, Leaf, ShieldCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
@@ -50,7 +50,7 @@ export default function AboutPage() {
         {/* HERO — opening ceremony photo greets the page, like the aerial
             shot does on the homepage */}
         <section className="relative h-[62svh] min-h-[400px] w-full overflow-hidden bg-[var(--ink)] sm:h-[74svh]">
-          <Image
+          <Img
             src="/opening-ceremony.jpg"
             alt={t("heroAlt")}
             fill

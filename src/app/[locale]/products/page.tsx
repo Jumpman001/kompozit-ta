@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { PipeViewer } from "@/components/pipe-viewer";
-import { JointViewer } from "@/components/joint-viewer";
+import { PipeViewer, JointViewer } from "@/components/viewers-lazy";
 import { Link } from "@/i18n/navigation";
-import Image from "next/image";
+import { Img } from "@/components/img";
 import { ArrowUpRight, Download, FileText, FolderOpen } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
@@ -46,7 +45,7 @@ export default function ProductsPage() {
       <main>
         {/* HERO — pipe yard photo greets the page */}
         <section className="relative h-[62svh] min-h-[400px] w-full overflow-hidden bg-[var(--ink)] sm:h-[74svh]">
-          <Image
+          <Img
             src="/pipes-yard.jpg"
             alt={t("heroAlt")}
             fill

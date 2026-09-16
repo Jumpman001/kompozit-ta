@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import Image from "next/image";
+import { Img } from "@/components/img";
 
 import {
 	motion,
@@ -88,7 +88,7 @@ const SmoothScrollHeroBackground: React.FC<
 				className="absolute inset-0 md:hidden"
 				style={{scale, transformOrigin: "85% 12%"}}
 			>
-				<Image
+				<Img
 					src={mobileImage}
 					alt={imageAlt}
 					fill
@@ -103,7 +103,7 @@ const SmoothScrollHeroBackground: React.FC<
 				className="absolute inset-0 hidden md:block"
 				style={{scale, transformOrigin: "50% 12%"}}
 			>
-				<Image
+				<Img
 					src={desktopImage}
 					alt={imageAlt}
 					fill

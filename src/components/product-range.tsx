@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
+import { Img } from "@/components/img";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ShieldCheck, X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -501,7 +501,7 @@ export function ProductRange() {
           const card = (
             <>
               {p.photo && (
-                <Image
+                <Img
                   src={p.photo}
                   alt=""
                   aria-hidden

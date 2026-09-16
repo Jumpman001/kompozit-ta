@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
+import { Img } from "@/components/img";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -211,7 +211,7 @@ function ProjectModal({
                   key={src}
                   className="relative aspect-[16/10] overflow-hidden rounded-lg border border-[var(--line-2)] bg-[var(--paper-2)]"
                 >
-                  <Image
+                  <Img
                     src={src}
                     alt={`${project.title} — ${t("photosLabel")} ${i + 1}`}
                     fill

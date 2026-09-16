@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
+import { Img } from "@/components/img";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ImageIcon, Play, X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -144,7 +144,7 @@ function NewsModal({ item, onClose }: { item: News; onClose: () => void }) {
         <div className="px-6 py-7 sm:px-8 sm:py-8">
           {item.cover && (
             <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-xl border border-[var(--line-2)] bg-[var(--paper-2)]">
-              <Image
+              <Img
                 src={item.cover}
                 alt={item.title}
                 fill
@@ -181,7 +181,7 @@ function NewsModal({ item, onClose }: { item: News; onClose: () => void }) {
                     key={src}
                     className="relative aspect-[16/10] overflow-hidden rounded-lg border border-[var(--line-2)] bg-[var(--paper-2)]"
                   >
-                    <Image
+                    <Img
                       src={src}
                       alt={`${item.title} — ${t("photosLabel")} ${i + 1}`}
                       fill
@@ -218,7 +218,7 @@ export function NewsList() {
             <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-[var(--line-2)] bg-[var(--paper-2)]">
               {n.cover ? (
                 <>
-                  <Image
+                  <Img
                     src={n.cover}
                     alt={n.title}
                     fill
