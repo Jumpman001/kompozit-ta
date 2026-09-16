@@ -56,8 +56,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   images: {
-    // 90 — hero (компенсирует зум-анимацию), 75 — остальные фото
-    qualities: [75, 90],
+    // На Cloudflare Workers нет сервиса `/_next/image`, он возвращал оригинал
+    // при любой ширине. Варианты готовит `scripts/gen-images.mjs`, отдаёт их
+    // компонент `src/components/img.tsx`. Оптимизатор Next больше не нужен.
+    unoptimized: true,
   },
   async headers() {
     return [

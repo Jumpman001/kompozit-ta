@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { Img } from "@/components/img";
 import { getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { SiteHeader } from "@/components/site-header";
@@ -27,7 +27,7 @@ export default function ProductionPage() {
       <main>
         {/* HERO — winding-shop photo greets the page */}
         <section className="relative h-[62svh] min-h-[400px] w-full overflow-hidden bg-[var(--ink)] sm:h-[74svh]">
-          <Image
+          <Img
             src="/winding-shop.jpg"
             alt={t("heroAlt")}
             fill

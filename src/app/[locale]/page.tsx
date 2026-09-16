@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Img } from "@/components/img";
 import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -138,7 +138,7 @@ export default function Home() {
                 >
                   {a.img && (
                     <>
-                      <Image
+                      <Img
                         src={a.img}
                         alt=""
                         aria-hidden
@@ -178,7 +178,7 @@ export default function Home() {
                     href={s.href}
                     className="group relative isolate flex aspect-[4/3] flex-col justify-between overflow-hidden p-7"
                   >
-                    <Image
+                    <Img
                       src={s.img}
                       alt=""
                       aria-hidden
@@ -295,7 +295,7 @@ export default function Home() {
                       href="/certificates"
                       className="group relative block aspect-[3/4] overflow-hidden rounded-xl border border-[var(--line-2)] bg-white shadow-[0_10px_40px_-20px_rgba(17,20,15,0.35)]"
                     >
-                      <Image
+                      <Img
                         src={doc.src}
                         alt={doc.alt}
                         fill

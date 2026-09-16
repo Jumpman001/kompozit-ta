@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
+import { Img } from "@/components/img";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ImageIcon, Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -101,7 +101,7 @@ function PhotoArea({ tech }: { tech: Tech }) {
               key={src}
               className="relative aspect-[16/10] overflow-hidden rounded-lg border border-[var(--line-2)] bg-[var(--paper-2)]"
             >
-              <Image
+              <Img
                 src={src}
                 alt={`${tech.title} — ${t("photoPlaceholder")} ${i + 1}`}
                 fill

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { Img } from "@/components/img";
 import { Download, ShieldCheck, ArrowUpRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
@@ -75,7 +75,7 @@ export default function CertificatesPage() {
                       rel="noopener noreferrer"
                       className="group relative block overflow-hidden rounded-xl border border-[var(--line-2)] bg-white"
                     >
-                      <Image
+                      <Img
                         src={c.img}
                         alt={t(`${c.key}Alt`)}
                         width={1200}
@@ -167,7 +167,7 @@ export default function CertificatesPage() {
                       rel="noopener noreferrer"
                       className="group relative block aspect-[4/3] overflow-hidden border-b border-[var(--line-2)] bg-white"
                     >
-                      <Image
+                      <Img
                         src={c.img}
                         alt={t(`${c.key}Alt`)}
                         fill

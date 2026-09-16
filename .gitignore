@@ -54,3 +54,6 @@ next-env.d.ts
 
 # сборка OpenNext для Cloudflare Workers
 .open-next
+
+# облегчённые копии картинок — делаются при сборке
+/public/opt
