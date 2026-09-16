@@ -6,6 +6,12 @@
   // nodejs_compat обязателен: на нём работают и серверный рендер Next,
   // и proxy.ts (переключение языков), который в Next 16 всегда на Node.
   "compatibility_flags": ["nodejs_compat"],
+  // Обычные переменные, не секреты: эти адреса и так написаны на сайте.
+  // RESEND_API_KEY сюда НЕ кладём — он ставится через `wrangler secret put`.
+  "vars": {
+    "CONTACT_TO_EMAIL": "info@composite.tj",
+    "CONTACT_FROM_EMAIL": "noreply@composite.tj"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
