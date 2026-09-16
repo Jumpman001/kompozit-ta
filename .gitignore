@@ -51,3 +51,6 @@ next-env.d.ts
 /IMG_*.svg
 /*.pptx
 .DS_Store
+
+# сборка OpenNext для Cloudflare Workers
+.open-next
