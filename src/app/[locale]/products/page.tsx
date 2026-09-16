@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { PipeViewer } from "@/components/pipe-viewer";
-import { JointViewer } from "@/components/joint-viewer";
+import { PipeViewer, JointViewer } from "@/components/viewers-lazy";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { ArrowUpRight, Download, FileText, FolderOpen } from "lucide-react";
